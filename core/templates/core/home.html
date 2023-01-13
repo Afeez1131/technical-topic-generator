@@ -1,0 +1,117 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+    <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+        <header class="masthead mb-auto">
+            <div class="inner">
+                <h3 class="masthead-brand"><span>Technical Topics Generator</span></h3>
+                <nav class="nav nav-masthead justify-content-center">
+                    <a class="nav-link active" href="#">Home</a>
+                    <a class="nav-link" href="#">Features</a>
+                    <a class="nav-link" href="#">Contact</a>
+                </nav>
+            </div>
+        </header>
+
+        <main role="main" class="inner cover">
+            <h1 class="cover-heading">Writing Technical Article is already challenging, finding topics shouldn't
+                pose an additional challenge</h1>
+            <p class="lead"></p>
+            <form method="get" id="topic-form">
+                <div class="form-group pt-5">
+                    <input type="text" class="form-control form-control-lg" id="topic"
+                           placeholder="Enter a Word/Phrase e.g Django Models..." autocomplete="off">
+                </div>
+            </form>
+            <p class="lead">
+                <a href="#" class="btn btn-lg btn-secondary" onclick="sendRequest();">Generate Topics <i
+                        class="fas fa-spinner fa-spin"></i><i class="fas fa-cog fa-spin"></i></a>
+            </p>
+            <div id="topic-container">
+                <h3 class="mt-2 mb-1 .cover-heading">Generated Topics</h3>
+                <ul class="list-group list-group-flush mb-3" id="topic-list">
+
+                </ul>
+            </div>
+        </main>
+
+        <footer class="mastfoot mt-auto">
+            <div class="inner">
+                <p>Made with Love <a href="https://linkedin.com/"></a> by <a
+                        href="https://twitter.com/afeez1131">@afeez1131</a>.</p>
+            </div>
+        </footer>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(
+            documentReady()
+        )
+
+        function documentReady() {
+            let topic = $('#topic');
+            $('#topic-container').hide()
+            topic.focus()
+        }
+
+        let inputForm = document.getElementById('topic');
+        inputForm.addEventListener('input', function () {
+        let topic = $('#topic');
+        if (topic.val() === "" || topic.val().length === 0) {
+            console.log('emtpy')
+            topic.addClass('is-invalid')
+        } else {
+            topic.removeClass('is-invalid').addClass('is-valid');
+        }
+    })
+
+
+        $('#topic-form').submit(function (e) {
+            e.preventDefault();
+            console.log('form submitted');
+            sendRequest();
+        })
+        function sendRequest() {
+
+            $.ajax({
+                url: "{% url 'send_request' %}",
+                type: "GET",
+                data: {
+                    'topic': $('#topic').val()
+                },
+                success: function (data) {
+                    $('#topic').val('')
+                    let objectData = data.data;
+                    let arrayLength = objectData.length;
+                    let output = ''
+                    for (let i = 0; i < arrayLength; i++) {
+                        $('#topic-list').val('')
+                        console.log(objectData[i]);
+                        output += `<li class="list-group-item d-flex justify-content-between align-items-center" id='topic-${i}'>${objectData[i]}
+                        <button class="badge badge-secondary" onclick="copyTitle('topic-${i}');"><i class="fas fa-copy"></i></button>
+                        </li>`
+                    }
+                    $('#topic-list').html(output);
+                    $('#topic-container').show()
+                },
+                error: function () {
+                    console.log('error occured')
+                },
+
+            })
+        }
+
+        function copyTitle(id){
+            let t = $('#' + id);
+            {#console.log(t.html());#}
+            let copiedText = t.text();
+            var temp = document.createElement('textarea')
+            temp.value = copiedText;
+            temp.setAttribute('readonly', '');
+            document.body.appendChild(temp);
+            temp.select();
+            document.exec
+
+        }
+    </script>
+{% endblock %}
+
