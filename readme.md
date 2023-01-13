@@ -30,13 +30,13 @@ To run this project, you will need to add the following environment variables to
 Clone the project
 
 ```bash
-  git clone https://link-to-project
+  git clone https://github.com/Afeez1131/technical-topic-generator
 ```
 
 Go to the project directory
 
 ```bash
-  cd topic_generator
+  cd technical-topic-generator
 ```
 
 Install dependencies
