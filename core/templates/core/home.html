@@ -17,6 +17,10 @@
             <h1 class="cover-heading">Writing Technical Article is already challenging, finding topics shouldn't
                 pose an additional challenge</h1>
             <p class="lead"></p>
+            <hr>
+            <div id="counter">
+                <h1 id="counter" class="cover-heading"><span>{{ counter }}</span> TItle{{ counter | pluralize }} Generated so far</h1>
+            </div>
             <form method="get" id="topic-form">
                 <div class="form-group pt-5">
                     <input type="text" class="form-control form-control-lg" id="topic"
@@ -117,6 +121,7 @@ Afeez has developed several web applications that solve real-life problems in va
                         <button class="badge badge-secondary" onclick="copyTitle('${i}');"><i class="fas fa-copy"></i></button>
                         </li>`
                     }
+                    $('#counter span').text(data.counter)
                     $('#topic-list').html(output);
                     $.notify('success', 'success');
                     $('#topic-container h3').html(`Generated Titles for <b>${topic.toUpperCase()}</b>`)

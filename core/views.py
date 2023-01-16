@@ -5,11 +5,12 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
 from decouple import config
-from .models import Phrase, ArticleTopic
+from .models import Phrase, ArticleTopic, Counter
 
 
 def home(request):
-    return render(request, 'core/home.html')
+    counter, _ = Counter.objects.get_or_create()
+    return render(request, 'core/home.html', {'counter': counter.count})
 
 
 # def ajax_process_request(request):
@@ -30,12 +31,16 @@ def home(request):
 def ajax_process_request(request):
     out = []
     phrase = request.GET.get("topic", None).lower()
+
     response = send_api_request(phrase)
+    current_count, _ = Counter.objects.get_or_create()
+    current_count.count += 1
+    current_count.save()
     for title in response:
         if title != "" and title != "\n":
             title = ' '.join(title.rsplit()[1:])
             out.append(title)
-    return JsonResponse({"data": out, 'exist': False})
+    return JsonResponse({"data": out, 'exist': False, 'counter': current_count.count})
 
 
 def send_api_request(keyword):
