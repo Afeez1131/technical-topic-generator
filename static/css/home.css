@@ -124,3 +124,9 @@ li {
   color: black;
   font-family: 'Ubuntu', sans-serif;
 }
+
+.badge-secondary:hover {
+  background-color: #32383e;
+}
+
+

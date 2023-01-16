@@ -7,13 +7,13 @@
                 <h3 class="masthead-brand"><span>Technical Topics Generator</span></h3>
                 <nav class="nav nav-masthead justify-content-center">
                     <a class="nav-link active" href="#">Home</a>
-                    <a class="nav-link" href="#">Features</a>
-                    <a class="nav-link" href="#">Contact</a>
+                    <a class="nav-link" href="javascript:scrollTo('about-me')">About Me</a>
+                    <a class="nav-link" href="javascript:scrollTo('contact')">Contact</a>
                 </nav>
             </div>
         </header>
 
-        <main role="main" class="inner cover">
+        <main role="main" class="inner cover mt-5">
             <h1 class="cover-heading">Writing Technical Article is already challenging, finding topics shouldn't
                 pose an additional challenge</h1>
             <p class="lead"></p>
@@ -24,21 +24,27 @@
                 </div>
             </form>
             <p class="lead">
-                <a href="#" class="btn btn-lg btn-secondary" onclick="sendRequest();">Generate Topics <i
-                        class="fas fa-spinner fa-spin"></i><i class="fas fa-cog fa-spin"></i></a>
+                <button class="btn btn-lg btn-secondary" onclick="sendRequest();" id="generate-button">Generate Topics </button>
+                <button class="btn btn-lg btn-success" onclick="reset();" id="reset-button">Reset </button>
             </p>
             <div id="topic-container">
-                <h3 class="mt-2 mb-1 .cover-heading">Generated Topics</h3>
+                <h3 class="mt-2 mb-1 cover-heading">Generated Topics</h3>
+                <p id="exists"></p>
                 <ul class="list-group list-group-flush mb-3" id="topic-list">
 
                 </ul>
             </div>
+            <div class="pt-5">
+                <h1 id="about-me" class="cover-heading">About Me</h1>
+                <p>Afeez is a dedicated and efficient backend engineer (Django) with a passion for developing innovative software programs that accelerate the efficiency and effectiveness of organizational success. He is well-versed in technology and writing code to create reliable and user-friendly systems.
+Afeez has developed several web applications that solve real-life problems in various sectors, with some of his projects having thousands of users.</p>
+            </div>
         </main>
 
         <footer class="mastfoot mt-auto">
-            <div class="inner">
-                <p>Made with Love <a href="https://linkedin.com/"></a> by <a
-                        href="https://twitter.com/afeez1131">@afeez1131</a>.</p>
+            <div class="inner" id="contact">
+                <p>Made with Love <a href="https://www.linkedin.com/in/lawal-afeez/">by Lawal Afeez</a> |
+                    <a href="https://github.com/afeez1131">@afeez1131</a>.</p>
             </div>
         </footer>
     </div>
@@ -51,6 +57,9 @@
             let topic = $('#topic');
             $('#topic-container').hide()
             topic.focus()
+            if ($('#topic-container ul').html().trim().length === 0) {
+                $('#reset-button').prop('disabled', true);
+            }
         }
 
         let inputForm = document.getElementById('topic');
@@ -64,6 +73,15 @@
         }
     })
 
+        function reset() {
+            $('#topic-container ul').html('');
+            $('#topic-container').hide();
+            $('#reset-button').prop('disabled', true);
+        }
+
+        function scrollTo(id) {
+          document.querySelector('#'+id).scrollIntoView({behavior: 'smooth'});
+        }
 
         $('#topic-form').submit(function (e) {
             e.preventDefault();
@@ -71,7 +89,7 @@
             sendRequest();
         })
         function sendRequest() {
-
+            $('#generate-button').html(`Generating <i class="fas fa-spinner fa-spin"></i>`)
             $.ajax({
                 url: "{% url 'send_request' %}",
                 type: "GET",
@@ -79,37 +97,50 @@
                     'topic': $('#topic').val()
                 },
                 success: function (data) {
-                    $('#topic').val('')
                     let objectData = data.data;
+                    /*let exists = data.exist
+                    if (exists === true) {
+                        $('#exists').html(`We have some previously generated titles related to "${topic}"<br>
+                                        Or you can generate a new one by clicking here`);
+                    } else {
+                        $('#exists').text('');
+                    }*/
+                    let topic = $('#topic').val();
+                    $('#reset-button').prop('disabled', false);
+                    $('#topic').val('')   // clear the value of the input
                     let arrayLength = objectData.length;
                     let output = ''
+                    $('#generate-button').html("Generate Topics")
                     for (let i = 0; i < arrayLength; i++) {
                         $('#topic-list').val('')
-                        console.log(objectData[i]);
                         output += `<li class="list-group-item d-flex justify-content-between align-items-center" id='topic-${i}'>${objectData[i]}
-                        <button class="badge badge-secondary" onclick="copyTitle('topic-${i}');"><i class="fas fa-copy"></i></button>
+                        <button class="badge badge-secondary" onclick="copyTitle('${i}');"><i class="fas fa-copy"></i></button>
                         </li>`
                     }
                     $('#topic-list').html(output);
+                    $.notify('success', 'success');
+                    $('#topic-container h3').html(`Generated Titles for <b>${topic.toUpperCase()}</b>`)
                     $('#topic-container').show()
                 },
                 error: function () {
                     console.log('error occured')
+                    $.notify('Error occured', 'error');
                 },
 
             })
         }
 
         function copyTitle(id){
-            let t = $('#' + id);
-            {#console.log(t.html());#}
-            let copiedText = t.text();
-            var temp = document.createElement('textarea')
-            temp.value = copiedText;
-            temp.setAttribute('readonly', '');
+            let tid = $('#topic-'+ id).text();
+            let temp = document.createElement('input');
+            temp.value = tid;
             document.body.appendChild(temp);
-            temp.select();
-            document.exec
+            temp.select()
+
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+            $.notify(`${tid} copied.`, 'success');
+
 
         }
     </script>

@@ -1,6 +1,7 @@
 import json
 
 import requests
+from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
 from decouple import config
@@ -11,29 +12,40 @@ def home(request):
     return render(request, 'core/home.html')
 
 
+# def ajax_process_request(request):
+#     phrase = request.GET.get("topic", None).lower()
+#     exist, out = check_keyword_exists(phrase)
+#     if not exist:
+#         out = []
+#         phrase = Phrase.objects.create(word=phrase)
+#         response = send_api_request(phrase)
+#         for title in response:
+#             if title != "" and title != "\n":
+#                 ArticleTopic.objects.create(phrase=phrase, title=title)
+#                 out.append(title)
+#         return JsonResponse({"data": out, 'exist': False})
+#     else:
+#         return JsonResponse({'data': out, 'exist': True})
+
 def ajax_process_request(request):
-    phrase = request.GET.get("topic", None)
-    exist, out = check_keyword_exists(phrase)
-    if not exist:
-        out = []
-        phrase = Phrase.objects.create(word=phrase)
-        response = send_api_request(phrase)
-        for title in response:
-            if title != "" and title != "\n":
-                ArticleTopic.objects.create(phrase=phrase, title=title)
-                out.append(title)
-    return JsonResponse({"data": out})
+    out = []
+    phrase = request.GET.get("topic", None).lower()
+    response = send_api_request(phrase)
+    for title in response:
+        if title != "" and title != "\n":
+            title = ' '.join(title.rsplit()[1:])
+            out.append(title)
+    return JsonResponse({"data": out, 'exist': False})
 
 
 def send_api_request(keyword):
-    api_key = config("OPEN_API_KEY")
+    api_key = settings.OPEN_API_KEY
     url = "https://api.openai.com/v1/completions"
     headers = {"Content-Type": "application/json",
                "Authorization": f"Bearer {api_key}"}
     data = {
-        "model": "text-davinci-001",
-        "prompt": f"List couple technical article topics on {keyword}.",
-        # "prompt": "write several Muslim pickup lines for Aeeshah ",
+        "model": "text-davinci-002",
+        "prompt": f"generate 5 technical article topics on {keyword}.",
         "temperature": 0.4,
         "max_tokens": 100,
         "top_p": 1,
@@ -55,5 +67,7 @@ def check_keyword_exists(keyword: str):
         return True, output
     except Phrase.DoesNotExist:
         return False, []
+
+
 
 
