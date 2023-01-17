@@ -74,5 +74,6 @@ def check_keyword_exists(keyword: str):
         return False, []
 
 
+def about(request):
 
-
+    return render(request, 'core/about.html')
