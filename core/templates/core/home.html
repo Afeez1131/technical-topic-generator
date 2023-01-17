@@ -81,7 +81,12 @@
         $('#topic-form').submit(function (e) {
             e.preventDefault();
             console.log('form submitted');
-            sendRequest();
+            if ($('#topic').val().trim().length !== 0) {
+                sendRequest();
+            } else {
+                $.notify('Input cannot be empty', 'error');
+            }
+
         })
 
         function sendRequest() {
