@@ -6,6 +6,7 @@ from core.models import Counter
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
+        User.objects.get(username='admin').delete()
         if not User.objects.filter(username='admin').exists():
             user = User.objects.create(username='admin', email='admin@gmail.com')
             user.set_password('testpass123')
