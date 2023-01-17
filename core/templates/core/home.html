@@ -17,10 +17,10 @@
             <h1 class="cover-heading">Writing Technical Article is already challenging, finding topics shouldn't
                 pose an additional challenge</h1>
             <p class="lead"></p>
-            <hr>
-            <div id="counter">
-                <h1 id="counter" class="cover-heading"><span>{{ counter }}</span> TItle{{ counter | pluralize }} Generated so far</h1>
-            </div>
+            <hr style="color:white;">
+            {#            <div id="counter">#}
+            {#                <h1 id="counter" class="cover-heading">We have generated <span>{{ counter }}</span> TItle{{ counter | pluralize }} so far</h1>#}
+            {#            </div>#}
             <form method="get" id="topic-form">
                 <div class="form-group pt-5">
                     <input type="text" class="form-control form-control-lg" id="topic"
@@ -28,8 +28,9 @@
                 </div>
             </form>
             <p class="lead">
-                <button class="btn btn-lg btn-secondary" onclick="sendRequest();" id="generate-button">Generate Topics </button>
-                <button class="btn btn-lg btn-success" onclick="reset();" id="reset-button">Reset </button>
+                <button class="btn btn-lg btn-secondary" onclick="sendRequest();" id="generate-button">Generate Topics
+                </button>
+                <button class="btn btn-lg btn-success" onclick="reset();" id="reset-button">Reset</button>
             </p>
             <div id="topic-container">
                 <h3 class="mt-2 mb-1 cover-heading">Generated Topics</h3>
@@ -38,11 +39,14 @@
 
                 </ul>
             </div>
-            <div class="pt-5">
-                <h1 id="about-me" class="cover-heading">About Me</h1>
-                <p>Afeez is a dedicated and efficient backend engineer (Django) with a passion for developing innovative software programs that accelerate the efficiency and effectiveness of organizational success. He is well-versed in technology and writing code to create reliable and user-friendly systems.
-Afeez has developed several web applications that solve real-life problems in various sectors, with some of his projects having thousands of users.</p>
-            </div>
+{#            <div class="pt-5">#}
+{#                <h1 id="about-me" class="cover-heading">About Me</h1>#}
+{#                <p>Afeez is a dedicated and efficient backend engineer (Django) with a passion for developing innovative#}
+{#                    software programs that accelerate the efficiency and effectiveness of organizational success. He is#}
+{#                    well-versed in technology and writing code to create reliable and user-friendly systems.#}
+{#                    Afeez has developed several web applications that solve real-life problems in various sectors, with#}
+{#                    some of his projects having thousands of users.</p>#}
+{#            </div>#}
         </main>
 
         <footer class="mastfoot mt-auto">
@@ -68,14 +72,14 @@ Afeez has developed several web applications that solve real-life problems in va
 
         let inputForm = document.getElementById('topic');
         inputForm.addEventListener('input', function () {
-        let topic = $('#topic');
-        if (topic.val() === "" || topic.val().length === 0) {
-            console.log('emtpy')
-            topic.addClass('is-invalid')
-        } else {
-            topic.removeClass('is-invalid').addClass('is-valid');
-        }
-    })
+            let topic = $('#topic');
+            if (topic.val() === "" || topic.val().length === 0) {
+                console.log('emtpy')
+                topic.addClass('is-invalid')
+            } else {
+                topic.removeClass('is-invalid').addClass('is-valid');
+            }
+        })
 
         function reset() {
             $('#topic-container ul').html('');
@@ -84,7 +88,7 @@ Afeez has developed several web applications that solve real-life problems in va
         }
 
         function scrollTo(id) {
-          document.querySelector('#'+id).scrollIntoView({behavior: 'smooth'});
+            document.querySelector('#' + id).scrollIntoView({behavior: 'smooth'});
         }
 
         $('#topic-form').submit(function (e) {
@@ -92,6 +96,7 @@ Afeez has developed several web applications that solve real-life problems in va
             console.log('form submitted');
             sendRequest();
         })
+
         function sendRequest() {
             $('#generate-button').html(`Generating <i class="fas fa-spinner fa-spin"></i>`)
             $.ajax({
@@ -121,7 +126,7 @@ Afeez has developed several web applications that solve real-life problems in va
                         <button class="badge badge-secondary" onclick="copyTitle('${i}');"><i class="fas fa-copy"></i></button>
                         </li>`
                     }
-                    $('#counter span').text(data.counter)
+                    {#$('#counter span').text(data.counter)#}
                     $('#topic-list').html(output);
                     $.notify('success', 'success');
                     $('#topic-container h3').html(`Generated Titles for <b>${topic.toUpperCase()}</b>`)
@@ -135,8 +140,8 @@ Afeez has developed several web applications that solve real-life problems in va
             })
         }
 
-        function copyTitle(id){
-            let tid = $('#topic-'+ id).text();
+        function copyTitle(id) {
+            let tid = $('#topic-' + id).text().trim();
             let temp = document.createElement('input');
             temp.value = tid;
             document.body.appendChild(temp);

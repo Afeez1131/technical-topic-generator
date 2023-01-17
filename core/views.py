@@ -13,25 +13,10 @@ def home(request):
     return render(request, 'core/home.html', {'counter': counter.count})
 
 
-# def ajax_process_request(request):
-#     phrase = request.GET.get("topic", None).lower()
-#     exist, out = check_keyword_exists(phrase)
-#     if not exist:
-#         out = []
-#         phrase = Phrase.objects.create(word=phrase)
-#         response = send_api_request(phrase)
-#         for title in response:
-#             if title != "" and title != "\n":
-#                 ArticleTopic.objects.create(phrase=phrase, title=title)
-#                 out.append(title)
-#         return JsonResponse({"data": out, 'exist': False})
-#     else:
-#         return JsonResponse({'data': out, 'exist': True})
-
 def ajax_process_request(request):
-    out = []
     phrase = request.GET.get("topic", None).lower()
-
+    out = []
+    phrase, _ = Phrase.objects.get_or_create(word=phrase)
     response = send_api_request(phrase)
     current_count, _ = Counter.objects.get_or_create()
     current_count.count += 1
@@ -39,8 +24,23 @@ def ajax_process_request(request):
     for title in response:
         if title != "" and title != "\n":
             title = ' '.join(title.rsplit()[1:])
+            ArticleTopic.objects.create(phrase=phrase, title=title)
             out.append(title)
-    return JsonResponse({"data": out, 'exist': False, 'counter': current_count.count})
+    return JsonResponse({"data": out, 'exist': False})
+
+# def ajax_process_request(request):
+#     out = []
+#     phrase = request.GET.get("topic", None).lower()
+#
+#     response = send_api_request(phrase)
+#     current_count, _ = Counter.objects.get_or_create()
+#     current_count.count += 1
+#     current_count.save()
+#     for title in response:
+#         if title != "" and title != "\n":
+#             title = ' '.join(title.rsplit()[1:])
+#             out.append(title)
+#     return JsonResponse({"data": out, 'exist': False, 'counter': current_count.count})
 
 
 def send_api_request(keyword):

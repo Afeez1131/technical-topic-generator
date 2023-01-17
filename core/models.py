@@ -8,13 +8,19 @@ class Phrase(models.Model):
     def __str__(self):
         return self.word
 
+    class Meta:
+        ordering = ('-id',)
+
 
 class ArticleTopic(models.Model):
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE, related_name='topics')
-    title = models.CharField(max_length=150)
+    title = models.TextField(max_length=150)
 
     def __str__(self):
         return self.phrase.word + ': ' + self.title
+
+    class Meta:
+        ordering = ('-id',)
 
 
 class Counter(models.Model):
@@ -22,5 +28,8 @@ class Counter(models.Model):
 
     def __str__(self):
         return str(self.count)
+
+    class Meta:
+        ordering = ('-id',)
 
 
