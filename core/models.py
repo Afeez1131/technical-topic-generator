@@ -6,7 +6,7 @@ class Phrase(models.Model):
     word = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.word
+        return f"word - {self.word}"
 
     class Meta:
         ordering = ('-id',)
