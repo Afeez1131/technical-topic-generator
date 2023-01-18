@@ -132,7 +132,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 OPEN_API_KEY = config("OPEN_API_KEY")
 
-IS_LIVE_SERVER = False
+IS_LIVE_SERVER = True
 
 if IS_LIVE_SERVER:
     from productions_settings import *
