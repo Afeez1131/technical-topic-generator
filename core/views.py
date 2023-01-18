@@ -9,8 +9,8 @@ from .models import Phrase, ArticleTopic, Counter
 
 
 def home(request):
-    counter, _ = Counter.objects.get_or_create()
-    return render(request, 'core/home.html', {'counter': counter.count})
+    # counter, _ = Counter.objects.get_or_create()
+    return render(request, 'core/home.html', {})
 
 
 def ajax_process_request(request):
