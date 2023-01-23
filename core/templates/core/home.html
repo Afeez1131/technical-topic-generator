@@ -8,14 +8,26 @@
     {#            <div id="counter">#}
     {#                <h1 id="counter" class="cover-heading">We have generated <span>{{ counter }}</span> TItle{{ counter | pluralize }} so far</h1>#}
     {#            </div>#}
-    <form method="get" id="topic-form">
-        <div class="form-group pt-5">
-            <input type="text" class="form-control form-control-lg" id="topic"
+    <form method="POST" id="topic-form" class="mb-4">
+    {% csrf_token %}
+        <div class="form-group pt-4">
+            <input type="text" name='input_topic' class="form-control form-control-lg" id="topic"
                    placeholder="Enter a Word/Phrase e.g Django Models..." autocomplete="off">
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                {{ form.category }}
+
+            </div>
+            <div class="col-md-4">
+                <input name='title_count' class="form-control form-control-lg" type="number" min="1" max="10"
+                       placeholder="7" id="id_count">
+            </div>
         </div>
     </form>
     <p class="lead">
-        <button class="btn btn-lg btn-secondary" onclick="sendRequest();" id="generate-button">Generate Topics
+        <button type="submit" class="btn btn-lg btn-secondary" id="generate-button"
+                onclick="sendRequest();">Generate Topics
         </button>
         <button class="btn btn-lg btn-success" onclick="reset();" id="reset-button">Reset</button>
     </p>
@@ -50,8 +62,9 @@
 
         function documentReady() {
             let topic = $('#topic');
-            $('#topic-container').hide()
             topic.focus()
+
+            $('#topic-container').hide()
             if ($('#topic-container ul').html().trim().length === 0) {
                 $('#reset-button').prop('disabled', true);
             }
@@ -68,6 +81,7 @@
             }
         })
 
+
         function reset() {
             $('#topic-container ul').html('');
             $('#topic-container').hide();
@@ -78,62 +92,88 @@
             document.querySelector('#' + id).scrollIntoView({behavior: 'smooth'});
         }
 
-        $('#topic-form').submit(function (e) {
-            e.preventDefault();
-            console.log('form submitted');
+        $('#topic, #id_count, #id_category').keyup(function (e) {
+            if (e.which === 13) {
+                /* we only need the enter key press,
+                * whenever any other key is pressed, do nothing
+                * if enter is pressed, proceed. */
+                if ($('#topic').val().trim().length !== 0) {
+                    sendRequest();
+                } else {
+                    $.notify('Input cannot be empty', 'error');
+                }
+            }
+        })
+
+        /*function submitForm() {
+            $('#topic-form').submit(function (e) {
+                e.preventDefault();
+                console.log('form submitted');
+                if ($('#topic').val().trim().length !== 0) {
+                    sendRequest();
+                } else {
+                    $.notify('Input cannot be empty', 'error');
+                }
+
+            })
+        }*/
+
+
+        function sendRequest() {
             if ($('#topic').val().trim().length !== 0) {
-                sendRequest();
+                $('#generate-button').html(`Generating <i class="fas fa-spinner fa-spin"></i>`)
+                $.ajax({
+                    url: "{% url 'send_request' %}",
+                    type: "POST",
+                    data: {
+                        'topic': $('#topic').val(),
+                        'count': $('#id_count').val(),
+                        'category': $('#id_category option:selected').val(),
+                        'csrfmiddlewaretoken': getCookie('csrftoken')
+                    },
+                    success: function (data) {
+                        let objectData = data.data;
+                        /*let exists = data.exist
+                        if (exists === true) {
+                            $('#exists').html(`We have some previously generated titles related to "${topic}"<br>
+                                            Or you can generate a new one by clicking here`);
+                        } else {
+                            $('#exists').text('');
+                        }*/
+                        let topic = $('#topic').val();
+                        $('#reset-button').prop('disabled', false);
+                        $('#topic').val('')   // clear the value of the input
+                        $('#id_count').val('')
+                        $('#id_category option:first').prop('selected',true);
+                        let arrayLength = objectData.length;
+                        let output = ''
+                        $('#generate-button').html("Generate Topics")
+                        for (let i = 0; i < arrayLength; i++) {
+                            $('#topic-list').val('')
+                            output += `<li class="list-group-item d-flex justify-content-between align-items-center" id='topic-${i}'>${i+1}. <span>${objectData[i]}</span>
+                            <button class="badge badge-secondary" onclick="copyTitle('${i}');">Copy <i class="fas fa-copy"></i></button>
+                            </li>`
+                        }
+                        $('#counter span').text(data.counter)
+                        $('#topic-list').html(output);
+                        $.notify('success', 'success');
+                        $('#topic-container h3').html(`Generated Titles for <b>${topic.toUpperCase()}</b>`)
+                        $('#topic-container').show()
+                    },
+                    error: function () {
+                        console.log('error occured')
+                        $.notify('Error occured', 'error');
+                    },
+
+                })
             } else {
                 $.notify('Input cannot be empty', 'error');
             }
-
-        })
-
-        function sendRequest() {
-            $('#generate-button').html(`Generating <i class="fas fa-spinner fa-spin"></i>`)
-            $.ajax({
-                url: "{% url 'send_request' %}",
-                type: "GET",
-                data: {
-                    'topic': $('#topic').val()
-                },
-                success: function (data) {
-                    let objectData = data.data;
-                    /*let exists = data.exist
-                    if (exists === true) {
-                        $('#exists').html(`We have some previously generated titles related to "${topic}"<br>
-                                        Or you can generate a new one by clicking here`);
-                    } else {
-                        $('#exists').text('');
-                    }*/
-                    let topic = $('#topic').val();
-                    $('#reset-button').prop('disabled', false);
-                    $('#topic').val('')   // clear the value of the input
-                    let arrayLength = objectData.length;
-                    let output = ''
-                    $('#generate-button').html("Generate Topics")
-                    for (let i = 0; i < arrayLength; i++) {
-                        $('#topic-list').val('')
-                        output += `<li class="list-group-item d-flex justify-content-between align-items-center" id='topic-${i}'>${objectData[i]}
-                        <button class="badge badge-secondary" onclick="copyTitle('${i}');"><i class="fas fa-copy"></i></button>
-                        </li>`
-                    }
-                    {#$('#counter span').text(data.counter)#}
-                    $('#topic-list').html(output);
-                    $.notify('success', 'success');
-                    $('#topic-container h3').html(`Generated Titles for <b>${topic.toUpperCase()}</b>`)
-                    $('#topic-container').show()
-                },
-                error: function () {
-                    console.log('error occured')
-                    $.notify('Error occured', 'error');
-                },
-
-            })
         }
 
         function copyTitle(id) {
-            let tid = $('#topic-' + id).text().trim();
+            let tid = $(`#topic-${id} span`).text().trim();
+
             let temp = document.createElement('input');
             temp.value = tid;
             document.body.appendChild(temp);
@@ -143,8 +183,10 @@
             document.body.removeChild(temp);
             $.notify(`${tid} copied.`, 'success');
 
-
         }
+
+
+
     </script>
 {% endblock %}
 
