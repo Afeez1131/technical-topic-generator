@@ -2,11 +2,23 @@ from django.db import models
 
 
 # Create your models here.
+
+
 class Phrase(models.Model):
+    CATEGORY = (
+        ('Technical Article', 'Technical Article'),
+        ('Documentation', 'Documentation'),
+        ('Proposals', 'Proposals'),
+        ('White Papers', 'White Papers'),
+        ('Instruction Manuals', 'Instruction Manuals'),
+        ('Essay', 'Essay'),
+        ('Medical Technical Writing', 'Medical Technical Writing')
+    )
     word = models.CharField(max_length=100)
+    category = models.CharField(max_length=150, default="Technical Article", choices=CATEGORY)
 
     def __str__(self):
-        return f"word - {self.word}"
+        return f"word - {self.word}: {self.category}"
 
     class Meta:
         ordering = ('-id',)
@@ -31,5 +43,3 @@ class Counter(models.Model):
 
     class Meta:
         ordering = ('-id',)
-
-
