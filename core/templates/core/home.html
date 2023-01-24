@@ -160,8 +160,8 @@
                             $.notify('success', 'success');
                             $('#topic-container h3').html(`Generated Titles for <b>${topic.toUpperCase()}</b>`)
                             $('#topic-container').show()
-                        } else if (e.error) {
-                            $.notify(e.error, 'error');
+                        } else if (data.error) {
+                            $.notify(data.error, 'error');
                         }
                     },
                     error: function () {
