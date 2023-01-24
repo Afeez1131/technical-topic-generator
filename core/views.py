@@ -17,22 +17,25 @@ def home(request):
 
 
 def ajax_process_request(request):
-    phrase = request.POST.get("topic", None).lower()
-    category = request.POST.get("category", None)
-    count = request.POST.get("count", None) or 5
-    count = int(count) if int(count) < 10 else 5
-    out = []
-    phrase, _ = Phrase.objects.get_or_create(word=phrase)
-    response = send_api_request(phrase, category, count)
-    current_count, _ = Counter.objects.get_or_create()
-    current_count.count += 1
-    current_count.save()
-    for title in response:
-        if title != "" and title != "\n":
-            title = ' '.join(title.rsplit()[1:])
-            ArticleTopic.objects.create(phrase=phrase, title=title)
-            out.append(title)
-    return JsonResponse({"data": out, 'exist': False})
+    try:
+        phrase = request.POST.get("topic", None).lower()
+        category = request.POST.get("category", None)
+        count = request.POST.get("count", None) or 5
+        count = int(count) if int(count) < 10 else 5
+        out = []
+        phrase, _ = Phrase.objects.get_or_create(word=phrase)
+        response = send_api_request(phrase, category, count)
+        current_count, _ = Counter.objects.get_or_create()
+        current_count.count += 1
+        current_count.save()
+        for title in response:
+            if title != "" and title != "\n":
+                title = ' '.join(title.rsplit()[1:])
+                ArticleTopic.objects.create(phrase=phrase, title=title)
+                out.append(title)
+        return JsonResponse({"data": out, 'exist': False})
+    except Exception as e:
+        return JsonResponse({'error': str(e)})
 
 
 # def ajax_process_request(request):

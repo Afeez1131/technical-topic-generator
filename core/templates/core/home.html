@@ -132,33 +132,37 @@
                         'csrfmiddlewaretoken': getCookie('csrftoken')
                     },
                     success: function (data) {
-                        let objectData = data.data;
-                        /*let exists = data.exist
-                        if (exists === true) {
-                            $('#exists').html(`We have some previously generated titles related to "${topic}"<br>
-                                            Or you can generate a new one by clicking here`);
-                        } else {
-                            $('#exists').text('');
-                        }*/
-                        let topic = $('#topic').val();
-                        $('#reset-button').prop('disabled', false);
-                        $('#topic').val('')   // clear the value of the input
-                        $('#id_count').val('')
-                        $('#id_category option:first').prop('selected',true);
-                        let arrayLength = objectData.length;
-                        let output = ''
-                        $('#generate-button').html("Generate Topics")
-                        for (let i = 0; i < arrayLength; i++) {
-                            $('#topic-list').val('')
-                            output += `<li class="list-group-item d-flex justify-content-between align-items-center" id='topic-${i}'>${i+1}. <span>${objectData[i]}</span>
-                            <button class="badge badge-secondary" onclick="copyTitle('${i}');">Copy <i class="fas fa-copy"></i></button>
-                            </li>`
+                        if (data.data) {
+                            let objectData = data.data;
+                            /*let exists = data.exist
+                            if (exists === true) {
+                                $('#exists').html(`We have some previously generated titles related to "${topic}"<br>
+                                                Or you can generate a new one by clicking here`);
+                            } else {
+                                $('#exists').text('');
+                            }*/
+                            let topic = $('#topic').val();
+                            $('#reset-button').prop('disabled', false);
+                            $('#topic').val('')   // clear the value of the input
+                            $('#id_count').val('')
+                            $('#id_category option:first').prop('selected', true);
+                            let arrayLength = objectData.length;
+                            let output = ''
+                            $('#generate-button').html("Generate Topics")
+                            for (let i = 0; i < arrayLength; i++) {
+                                $('#topic-list').val('')
+                                output += `<li class="list-group-item d-flex justify-content-between align-items-center" id='topic-${i}'>${i + 1}. <span>${objectData[i]}</span>
+                                <button class="badge badge-secondary" onclick="copyTitle('${i}');">Copy <i class="fas fa-copy"></i></button>
+                                </li>`
+                            }
+                            $('#counter span').text(data.counter)
+                            $('#topic-list').html(output);
+                            $.notify('success', 'success');
+                            $('#topic-container h3').html(`Generated Titles for <b>${topic.toUpperCase()}</b>`)
+                            $('#topic-container').show()
+                        } else if (e.error) {
+                            $.notify(e.error, 'error');
                         }
-                        $('#counter span').text(data.counter)
-                        $('#topic-list').html(output);
-                        $.notify('success', 'success');
-                        $('#topic-container h3').html(`Generated Titles for <b>${topic.toUpperCase()}</b>`)
-                        $('#topic-container').show()
                     },
                     error: function () {
                         console.log('error occured')
